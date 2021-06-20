@@ -17,9 +17,16 @@ jobs:
         uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: "*/*.yaml"
-
+      
       - name: Lint Ansible playbook
-        uses: ansible/ansible-lint-action@master
-        with:
-          targets: "*/*.yaml"
-        # run: ansible-playbook */*.yaml --check
+        run: |
+          apt install software-properties-common
+          add-apt-repository --yes --update ppa:ansible/ansible
+          apt install ansible
+          ansible-playbook */*.yaml --check
+
+      # - name: Lint Ansible playbook
+      #   uses: ansible/ansible-lint-action@master
+      #   with:
+      #     targets: "*/*.yaml"
+      #   # run: ansible-playbook */*.yaml --check
