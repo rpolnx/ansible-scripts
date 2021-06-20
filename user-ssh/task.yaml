@@ -1,0 +1,43 @@
+---
+- hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    group: "admin"
+    users:
+      - ["rpolnx"]
+    keys:
+      - ["rpolnx_key"]
+
+  tasks:
+    - name: Create group "{{ group }}"
+      group:
+        name: "{{ group }}"
+        state: present
+
+    - name: Allow {{ group }} group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^%{{ group }}"
+        line: "%{{ group }} ALL=(ALL) NOPASSWD: ALL"
+        validate: "visudo -cf %s"
+
+    - name: Creating users
+      user:
+        name: "{{ item }}"
+        groups: "{{ group }}"
+        shell: /bin/bash
+        append: yes
+        state: present
+        # password: "{{ password }}" # will use ssh
+      with_items: "{{ users }}"
+
+    - name: "Add authorized keys"
+      authorized_key:
+        user: "{{ item.1 }}"
+        key: "{{ lookup('file', './keys/'+ item.0 + '.pub') }}"
+      with_nested:
+        - "{{ keys }}"
+        - "{{ users }}"
+
