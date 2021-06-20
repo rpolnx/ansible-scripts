@@ -1,0 +1,25 @@
+name: Ansible validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Yaml lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: "*/*.yaml"
+
+      - name: Lint Ansible playbook
+        uses: ansible/ansible-lint-action@master
+        with:
+          targets: "*/*.yaml"
+        # run: ansible-playbook */*.yaml --check
