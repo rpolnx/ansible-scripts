@@ -1,0 +1,5 @@
+[master_node]
+192.168.100.14 ansible_connection=ssh ansible_ssh_user=ubuntu
+
+[worker_nodes]
+192.168.100.15 ansible_connection=ssh ansible_ssh_user=ubuntu
