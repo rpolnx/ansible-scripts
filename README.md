@@ -1,5 +1,7 @@
 # Ansible examples
 
+# Basics
+
 ## Creating users
  - "users-ssh"
 ```sh
