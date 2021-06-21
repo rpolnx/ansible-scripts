@@ -2,17 +2,17 @@
 - hosts: 127.0.0.1
   connection: local
   gather_facts: false
-  become: true
+  # become: true
   vars:
     image: "mongo"
     version: "4.2"
 
   tasks:
-    - name: Override docker-compose version
-      replace:
-        path: ./docker-compose.yml
-        replace: '\g<1>{{ version }}'
-        regexp: '^(\s+image: {{ image }}:)(.*)'
+    # - name: Override docker-compose version
+    #   replace:
+    #     path: ./docker-compose.yml
+    #     replace: '\g<1>{{ version }}'
+    #     regexp: '^(\s+image: {{ image }}:)(.*)'
 
     # In case of error, install docker from py3
     # https://stackoverflow.com/questions/59384708/ansible-returns-with-failed-to-import-the-required-python-library-docker-sdk-f
@@ -20,4 +20,7 @@
       docker_compose:
         project_src: .
         files:
-        - docker-compose.yml
+          - docker-compose.yml
+      environment:
+        IMAGE_NAME: "{{ image }}"
+        IMAGE_VERSION: "{{ version }}"
