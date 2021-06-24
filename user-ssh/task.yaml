@@ -3,13 +3,26 @@
   gather_facts: false
   become: true
   vars:
+    ansible_python_interpreter: "/usr/bin/python3"
     group: "admin"
+    key_path: ./keys/{{ item }}_key
     users:
       - ["rpolnx"]
-    keys:
-      - ["rpolnx_key"]
 
   tasks:
+    - name: Generate ssh keys
+      become: false
+      community.crypto.openssh_keypair:
+        path: "{{ key_path }}"
+        comment: "{{ item }}"
+      with_items: "{{ users }}"
+      when: inventory_hostname in groups['local']
+
+    - debug:
+        msg: "{{ lookup('file', key_path ) | md5}}"
+      with_items: "{{ users }}"
+      when: inventory_hostname in groups['local']
+
     - name: Create group "{{ group }}"
       group:
         name: "{{ group }}"
@@ -40,4 +53,3 @@
       with_nested:
         - "{{ keys }}"
         - "{{ users }}"
-
