@@ -4,3 +4,11 @@
   tasks:
      - name: Hello world
        command: "echo 'Hello World'"
+
+    - name: "Add authorized keys"
+      authorized_key:
+        user: "{{ item }}"
+        key: "{{ lookup('file', key_path + '.pub') }}"
+      with_items: "{{ users }}"
+      # with_nested:
+      #   - "{{ users }}"
