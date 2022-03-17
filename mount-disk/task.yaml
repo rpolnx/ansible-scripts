@@ -1,0 +1,40 @@
+---
+- hosts: local_vm
+  # connection: local
+  gather_facts: false
+  become: true
+  vars:
+    user: "rpolnx"
+    attach_path: "/dev/sdb"
+    mount_path: "/data"
+
+  tasks:
+    - name: Creates location to mount
+      file:
+        path: "{{ mount_path }}"
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0775
+    
+    - name: Create a new ext4 primary partition
+      community.general.parted:
+        device: "{{ attach_path }}"
+        number: 1
+        state: info # present
+        resize: true
+        fs_type: ext4
+        part_type: primary
+    
+    - name: Create a ext4 filesystem on attached path
+      community.general.filesystem:
+        fstype: ext4
+        dev: "{{ attach_path }}"
+
+    - name: Add mount point to fstab
+      mount:
+        src: "{{ attach_path }}"
+        path: "{{ mount_path }}"
+        state: mounted
+        fstype: ext4
+        boot: true
